@@ -1,58 +1,83 @@
 <?php
 session_start();
 require "../include/db.php";
+require "../include/config.php";
 
 $error = "";
 
 if (isset($_POST['login'])) {
-  $email = trim($_POST['email']);
-  $password = $_POST['password'];
+    $email    = trim($_POST['email']);
+    $password = $_POST['password'];
+    $captcha  = $_POST['g-recaptcha-response'];
 
-  $sql = "
-        SELECT users.*, roles.name AS role_name
-        FROM users
-        JOIN roles ON users.role_id = roles.id
-        WHERE email = ? AND status = 1
-    ";
-  $stmt = $conn->prepare($sql);
-  $stmt->execute([$email]);
-  $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    if ($email == "" || $password == "") {
+        $error = "Không được để trống dữ liệu";
+    } elseif (!$captcha) {
+        $error = "Vui lòng xác nhận Captcha";
+    } else {
 
-  if (!$user || !password_verify($password, $user['password'])) {
-    $error = "Sai email hoặc mật khẩu";
-  } else {
-    $_SESSION['user_id'] = $user['id'];
-    $_SESSION['role_id'] = $user['role_id'];
-    $_SESSION['role_name'] = $user['role_name'];
-    $_SESSION['full_name'] = $user['full_name'];
+        /* Check captcha */
+        $verify = file_get_contents(
+            "https://www.google.com/recaptcha/api/siteverify?secret="
+            . RECAPTCHA_SECRET_KEY . "&response=" . $captcha
+        );
+        $response = json_decode($verify);
 
-    header("Location: ../index.php");
-    exit;
-  }
+        if (!$response->success) {
+            $error = "Captcha không hợp lệ";
+        } else {
+
+            $sql = "
+                SELECT users.*, roles.name AS role_name
+                FROM users
+                JOIN roles ON users.role_id = roles.id
+                WHERE email = ? AND status = 1
+            ";
+            $stmt = $conn->prepare($sql);
+            $stmt->execute([$email]);
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$user || !password_verify($password, $user['password'])) {
+                $error = "Sai email hoặc mật khẩu";
+            } else {
+                $_SESSION['user_id']   = $user['id'];
+                $_SESSION['full_name'] = $user['full_name'];
+                $_SESSION['role_name'] = $user['role_name'];
+
+                /* Điều hướng theo role */
+                if ($user['role_name'] === 'admin') {
+                    header("Location: ../admin/index.php");
+                } else {
+                    header("Location: ../index.php");
+                }
+                exit;
+            }
+        }
+    }
 }
 ?>
 <!DOCTYPE html>
 <html>
-
 <head>
-  <meta charset="UTF-8">
-  <title>Đăng nhập</title>
+    <meta charset="UTF-8">
+    <title>Đăng nhập</title>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </head>
-
 <body>
 
-  <h2>ĐĂNG NHẬP</h2>
+<h2>ĐĂNG NHẬP</h2>
 
-  <form method="POST">
-    <input type="email" name="email" required placeholder="Email"><br><br>
-    <input type="password" name="password" required placeholder="Mật khẩu"><br><br>
+<form method="POST">
+    <input type="email" name="email" placeholder="Email" required><br><br>
+    <input type="password" name="password" placeholder="Mật khẩu" required><br><br>
+
+    <div class="g-recaptcha" data-sitekey="<?= RECAPTCHA_SITE_KEY ?>"></div><br>
+
     <button name="login">Đăng nhập</button>
-  </form>
+</form>
 
-  <p style="color:red"><?php echo $error; ?></p>
-
-  <a href="register.php">Đăng ký</a>
+<p style="color:red"><?= $error ?></p>
+<a href="register.php">Đăng ký</a>
 
 </body>
-
 </html>
