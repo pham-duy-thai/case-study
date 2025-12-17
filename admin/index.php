@@ -1,24 +1,26 @@
 <?php
-require "include/auth_check.php";
+require "auth_check.php";
+$title = "Admin Panel";
+include "../include/layout.php";
 ?>
 
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>Admin Panel</title>
-</head>
-<body>
+<div class="row">
+  <div class="col-md-3">
+    <div class="list-group">
+      <a href="index.php" class="list-group-item active">Dashboard</a>
+      <a href="users.php" class="list-group-item">Quản lý tài khoản</a>
+      <a href="posts.php" class="list-group-item">Quản lý tin đăng</a>
+    </div>
+  </div>
 
-<h2>TRANG QUẢN TRỊ</h2>
+  <div class="col-md-9">
+    <div class="card">
+      <div class="card-body">
+        <h4>Xin chào Admin</h4>
+        <p>Hệ thống quản lý phòng trọ</p>
+      </div>
+    </div>
+  </div>
+</div>
 
-<p>Xin chào: <b><?php echo $_SESSION['full_name']; ?></b></p>
-<p>Quyền: <b><?php echo $_SESSION['role_name']; ?></b></p>
-
-<ul>
-    <li><a href="../index.php">Trang người dùng</a></li>
-    <li><a href="../auth/logout.php">Đăng xuất</a></li>
-</ul>
-
-</body>
-</html>
+<?php include "../include/footer.php"; ?>
