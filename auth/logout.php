@@ -6,5 +6,5 @@ session_unset();
 session_destroy();
 
 /* Quay về trang đăng nhập */
-header("Location: /c    ase-studt/auth/login.php");
+header("Location: ../auth/login.php");
 exit;
