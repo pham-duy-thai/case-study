@@ -65,7 +65,7 @@ if (isset($_POST['register'])) {
             $stmt->execute([$full_name, $email, $hash]);
 
             /* redirect ĐÚNG */
-            header("Location: /case-study/auth/login.php");
+            header("Location: /CASE-STUDY/auth/login.php");
             exit;
         }
     }
@@ -94,7 +94,7 @@ if (isset($_POST['register'])) {
 </form>
 
 <p style="color:red"><?= $error ?></p>
-<a href="/case-study/auth/login.php">Đăng nhập</a>
+<a href="/CASE-STUDY/auth/login.php">Đăng nhập</a>
 
 </body>
 </html>
