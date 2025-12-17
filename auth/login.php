@@ -65,7 +65,7 @@ if (isset($_POST['login'])) {
 </head>
 <body>
 
-<h2>ĐĂNG NHẬP</h2>
+<h2>log in</h2>
 
 <form method="POST">
     <input type="email" name="email" placeholder="Email" required><br><br>
