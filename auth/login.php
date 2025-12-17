@@ -65,6 +65,7 @@ if (isset($_POST['login'])) {
 </head>
 <body>
 
+<h2>log in</h2>
 <h2>login</h2>
 
 <form method="POST">
